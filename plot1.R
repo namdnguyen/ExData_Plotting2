@@ -7,7 +7,6 @@
 ## emission from all sources for each of the years 1999, 2002, 2005, and 2008.
 
 ## Load libraries
-library(readr)
 library(dplyr)
 
 ## Set working directory and file names

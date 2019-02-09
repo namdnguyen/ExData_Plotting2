@@ -2,12 +2,15 @@
 
 ## Exploratory Data Analysis Course Project 2: Creating Plot 2
 ##
-## Have total emissions from PM2.5 decreased in the Baltimore City, Maryland
-## (fips == "24510"\color{red}{\verb|fips == "24510"|}fips=="24510") from 1999
-## to 2008? Use the base plotting system to make a plot answering this question.
+## Of the four types of sources indicated by the type (point, nonpoint, onroad,
+## nonroad) variable, which of these four sources have seen decreases in
+## emissions from 1999–2008 for Baltimore City? Which have seen increases in
+## emissions from 1999–2008? Use the ggplot2 plotting system to make a plot
+## answer this question.
 
 ## Load libraries
 library(dplyr)
+library(ggplot2)
 
 ## Set working directory and file names
 setwd("./")
@@ -36,15 +39,18 @@ scc <- readRDS(scc_file)
 
 ## Analyze data
 df <- nei %>%
-  select(year, Emissions, fips) %>%
+  select(year, Emissions, fips, type) %>%
   filter(fips == '24510') %>%
-  group_by(year) %>%
+  mutate(type = as.factor(type)) %>%
+  group_by(year, type) %>%
   summarize(total = sum(Emissions))
 
 ## Create plot
-png(filename = "plot2.png")
-plot(df$year, df$total, type = "l",
-     main = "Total Emissions in Baltimore, MD by Year",
-     xlab = "Year",
-     ylab = "Total Emissions")
-dev.off()
+ggplot(df , aes(year, total)) +
+  geom_point() +
+  facet_grid(. ~ type) +
+  labs(title = "Total Emissions in Baltimore by Year and Type",
+       x = "Year",
+       y = "Total Emission")
+
+ggsave("plot3.png")
