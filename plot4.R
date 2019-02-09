@@ -1,12 +1,9 @@
 #! /usr/bin/env Rscript
 
-## Exploratory Data Analysis Course Project 2: Creating Plot 3
+## Exploratory Data Analysis Course Project 2: Creating Plot 4
 ##
-## Of the four types of sources indicated by the type (point, nonpoint, onroad,
-## nonroad) variable, which of these four sources have seen decreases in
-## emissions from 1999–2008 for Baltimore City? Which have seen increases in
-## emissions from 1999–2008? Use the ggplot2 plotting system to make a plot
-## answer this question.
+## Across the United States, how have emissions from coal combustion-related
+## sources changed from 1999–2008?
 
 ## Load libraries
 library(dplyr)
@@ -37,20 +34,26 @@ if(!file.exists(nei_file) || !file.exists(scc_file)) {
 nei <- readRDS(nei_file)
 scc <- readRDS(scc_file)
 
+## Get SCC codes for coal fuel combustion
+coal <- scc %>%
+  filter(EI.Sector == "Fuel Comb - Electric Generation - Coal" |
+         EI.Sector == "Fuel Comb - Industrial Boilers, ICEs - Coal" |
+         EI.Sector == "Fuel Comb - Comm/Institutional - Coal") %>%
+  select(SCC)
+
 ## Analyze data
 df <- nei %>%
-  select(year, Emissions, fips, type) %>%
-  filter(fips == '24510') %>%
-  mutate(type = as.factor(type)) %>%
-  group_by(year, type) %>%
+  select(year, Emissions, SCC) %>%
+  filter(SCC %in% coal$SCC) %>%
+  group_by(year) %>%
   summarize(total = sum(Emissions))
 
 ## Create plot
 ggplot(df , aes(year, total)) +
   geom_point() +
-  facet_grid(. ~ type) +
-  labs(title = "Total Emissions in Baltimore by Year and Type",
+  geom_line() +
+  labs(title = "Total Emissions for Coal Combustion Sources by Year",
        x = "Year",
        y = "Total Emission")
 
-ggsave("plot3.png")
+ggsave("plot4.png")
