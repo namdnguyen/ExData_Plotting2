@@ -48,6 +48,7 @@ df <- nei %>%
 ## Create plot
 ggplot(df , aes(year, total)) +
   geom_point() +
+  geom_line() +
   facet_grid(. ~ type) +
   labs(title = "Total Emissions in Baltimore by Year and Type",
        x = "Year",
